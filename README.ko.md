@@ -117,7 +117,7 @@ jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: eun7661010/agent-skill-contracts@v0.1.0
         with:
           path: skills
@@ -126,7 +126,7 @@ jobs:
 CLI를 직접 설치해 실행해도 됩니다.
 
 ```yaml
-- uses: actions/setup-python@v5
+- uses: actions/setup-python@v7
   with:
     python-version: "3.12"
 - run: python -m pip install "git+https://github.com/eun7661010/agent-skill-contracts@v0.1.0"
