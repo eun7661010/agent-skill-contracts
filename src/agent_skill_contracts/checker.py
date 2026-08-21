@@ -4,13 +4,13 @@ import os
 import re
 from collections.abc import Iterable
 from dataclasses import dataclass
-from pathlib import Path
+from pathlib import Path, PurePosixPath, PureWindowsPath
 from typing import Any
 
 import yaml
 
 from agent_skill_contracts.errors import ContractConfigError
-from agent_skill_contracts.loader import load_contract
+from agent_skill_contracts.loader import load_contract, load_yaml
 from agent_skill_contracts.models import ConfigIssue, ContractResult, Finding, RunResult
 
 CONTRACT_NAMES = ("skill-contract.yaml", "skill-contract.yml", "skill-contract.json")
@@ -513,7 +513,7 @@ def _parse_frontmatter(text: str, path: Path) -> dict[str, Any]:
     if closing is None:
         raise ContractConfigError("SKILL.md frontmatter is not closed.", path=path)
     try:
-        metadata = yaml.safe_load("\n".join(lines[1:closing])) or {}
+        metadata = load_yaml("\n".join(lines[1:closing])) or {}
     except yaml.YAMLError as exc:
         raise ContractConfigError(f"Invalid SKILL.md frontmatter: {exc}", path=path) from exc
     if not isinstance(metadata, dict):
@@ -569,8 +569,30 @@ def _check_portability(value: Any, skill_dir: Path, path: Path) -> list[Finding]
     )
 
     findings: list[Finding] = []
-    for candidate in _iter_portability_files(skill_dir, scan_globs, exclude_globs):
+    for candidate in _iter_portability_files(skill_dir, scan_globs, exclude_globs, path):
         display = _relative_display(candidate, skill_dir)
+        try:
+            resolved = candidate.resolve(strict=True)
+        except OSError:
+            findings.append(
+                Finding(
+                    rule_id="portability.external_symlink",
+                    kind="broken_symlink",
+                    message="A scanned path cannot be resolved.",
+                    file=display,
+                )
+            )
+            continue
+        if not _is_within(resolved, skill_dir) and not allow_external:
+            findings.append(
+                Finding(
+                    rule_id="portability.external_symlink",
+                    kind="external_symlink",
+                    message="A scanned path resolves outside the skill directory.",
+                    file=display,
+                )
+            )
+            continue
         if candidate.is_symlink():
             try:
                 target = candidate.resolve(strict=True)
@@ -628,10 +650,25 @@ def _iter_portability_files(
     skill_dir: Path,
     scan_globs: list[str] | None,
     exclude_globs: list[str],
+    contract_path: Path,
 ) -> Iterable[Path]:
     if scan_globs is None:
         candidates = skill_dir.rglob("*")
     else:
+        for pattern in scan_globs:
+            normalized = pattern.replace("\\", "/")
+            posix_pattern = PurePosixPath(normalized)
+            windows_pattern = PureWindowsPath(pattern)
+            if (
+                posix_pattern.is_absolute()
+                or windows_pattern.is_absolute()
+                or windows_pattern.drive
+                or ".." in posix_pattern.parts
+            ):
+                raise ContractConfigError(
+                    f"portability.scan pattern escapes its allowed directory: {pattern}",
+                    path=contract_path,
+                )
         candidates = (candidate for pattern in scan_globs for candidate in skill_dir.glob(pattern))
     seen: set[Path] = set()
     for candidate in candidates:

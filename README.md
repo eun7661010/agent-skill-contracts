@@ -89,6 +89,7 @@ python -m pip install "git+https://github.com/eun7661010/agent-skill-contracts@v
 - Files that must exist inside the skill directory
 - References that must both exist and be mentioned by `SKILL.md`
 - Required frontmatter fields and `allowed-tools` declarations
+- Duplicate YAML or JSON mapping keys that could hide an earlier rule or setting
 - User-specific Windows, macOS, and Linux home paths
 - Symlinks that leave the skill directory
 - One contract or every contract below a repository path
@@ -144,7 +145,7 @@ The checker discovers these filenames recursively:
 - `skill-contract.yml`
 - `skill-contract.json`
 
-Paths inside a contract are relative to the contract directory and may not escape it. The optional `skill` field points to a skill directory below that location. Unknown fields fail closed unless their names start with `x-`.
+Paths inside a contract are relative to the contract directory and may not escape it, including glob patterns under `portability.scan`. Duplicate YAML or JSON keys are rejected instead of silently keeping one value. The optional `skill` field points to a skill directory below that location. Unknown fields fail closed unless their names start with `x-`.
 
 See the [contract reference](docs/contract-reference.md) and the machine-readable [JSON Schema](schema/skill-contract.schema.json) for every field.
 

@@ -8,6 +8,8 @@ This document describes contract schema version `1`. The JSON Schema at `schema/
 
 Every path in a contract is relative. It is resolved from the contract directory and must stay below that directory. Rule targets, required files, reference files, and reference source files must also remain inside the selected skill directory.
 
+YAML and JSON mapping keys must be unique at every depth. A duplicate key is a configuration error; the CLI never resolves the ambiguity by silently keeping one value. Glob patterns in `portability.scan` must also be relative and may not contain parent traversal.
+
 ## Top-level fields
 
 ### `version`
@@ -103,6 +105,8 @@ portability:
 Use `allow` only for reviewed synthetic negative fixtures. Broad allow patterns can hide real portability problems.
 
 External symlinks are rejected by default because they make a skill depend on files that are absent from a fresh clone. Broken symlinks are always reported.
+
+Every matched scan entry is resolved before it is read. An external or broken symbolic link is reported rather than followed.
 
 ## Extension fields
 

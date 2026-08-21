@@ -106,6 +106,38 @@ def test_invalid_yaml_and_missing_path_are_config_errors(tmp_path: Path) -> None
     assert "does not exist" in missing.config_issues[0].message
 
 
+@pytest.mark.parametrize("suffix", ["yaml", "json"])
+def test_duplicate_mapping_keys_are_rejected(tmp_path: Path, suffix: str) -> None:
+    write(tmp_path / "SKILL.md", valid_skill())
+    if suffix == "yaml":
+        contract = """version: 1
+rules:
+  - id: approval
+    require:
+      all: [MUST-PRESERVE]
+    require:
+      all: [Safe deploy]
+portability: false
+"""
+    else:
+        contract = """{
+  "version": 1,
+  "rules": [{
+    "id": "approval",
+    "require": {"all": ["MUST-PRESERVE"]},
+    "require": {"all": ["Safe deploy"]}
+  }],
+  "portability": false
+}
+"""
+    write(tmp_path / f"skill-contract.{suffix}", contract)
+
+    result = check_path(tmp_path)
+
+    assert result.exit_code == 2
+    assert "Duplicate" in result.config_issues[0].message
+
+
 def test_missing_target_is_a_behavioral_finding(tmp_path: Path) -> None:
     result = run_contract(
         tmp_path,

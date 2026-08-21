@@ -4,6 +4,9 @@ Purpose: deterministic policy-as-code checks for repository-specific SKILL.md be
 
 Use this project when a skill must retain required approval language, prohibited instructions, required files or references, declared tools, and portable paths across edits.
 
+Contracts reject duplicate YAML/JSON keys. Contract paths and portability scan
+patterns are confined to the declared directory, and external links are not read.
+
 Primary command:
   skill-contract check <contract-file-or-directory> [--format text|json|github]
 

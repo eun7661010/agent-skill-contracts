@@ -202,6 +202,64 @@ def test_external_symlink_is_rejected_or_platform_skips(tmp_path: Path) -> None:
     assert any(finding.kind == "external_symlink" for finding in result.results[0].findings)
 
 
+def test_portability_scan_cannot_escape_skill_root(tmp_path: Path) -> None:
+    skill = tmp_path / "skill"
+    write(skill / "SKILL.md", valid_skill())
+    write(tmp_path / "outside.md", "Synthetic /home/sample-user/private.txt\n")
+    write(
+        skill / "skill-contract.yaml",
+        """version: 1
+rules:
+  - id: base
+    require: {all: [Safe deploy]}
+portability:
+  scan: [../outside.md]
+""",
+    )
+
+    result = check_path(skill)
+
+    assert result.exit_code == 2
+    assert "portability.scan" in result.config_issues[0].message
+    assert "escapes its allowed directory" in result.config_issues[0].message
+
+
+def test_portability_scan_rejects_external_directory_symlink(tmp_path: Path) -> None:
+    skill = tmp_path / "skill"
+    outside = tmp_path / "outside"
+    write(skill / "SKILL.md", valid_skill())
+    write(outside / "deep" / "a.md", "Synthetic /home/sample-user/private.txt\n")
+    link = skill / "linked"
+    try:
+        link.symlink_to(outside, target_is_directory=True)
+    except OSError as exc:
+        pytest.skip(f"Directory symlink creation is unavailable: {exc}")
+    write(
+        skill / "skill-contract.yaml",
+        """version: 1
+rules:
+  - id: base
+    require: {all: [Safe deploy]}
+portability:
+  scan: [linked/**/*.md]
+""",
+    )
+
+    result = check_path(skill)
+
+    assert result.exit_code == 1
+    assert any(finding.kind == "external_symlink" for finding in result.results[0].findings)
+
+
+def test_composite_action_keeps_path_input_out_of_inline_shell() -> None:
+    action = yaml.safe_load((Path(__file__).parents[1] / "action.yml").read_text("utf-8"))
+    check_step = action["runs"]["steps"][-1]
+
+    assert check_step["env"]["INPUT_PATH"] == "${{ inputs.path }}"
+    assert "${{ inputs.path }}" not in check_step["run"]
+    assert '-- "$INPUT_PATH"' in check_step["run"]
+
+
 def test_text_output_and_invalid_path_output(tmp_path: Path, capsys: object) -> None:
     make_valid_contract(tmp_path)
 
