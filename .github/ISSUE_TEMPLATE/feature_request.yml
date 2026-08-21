@@ -1,0 +1,26 @@
+name: Feature request
+description: Propose a deterministic contract check or integration.
+title: "[Feature]: "
+labels: [enhancement, triage]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: Which regression or workflow failure should this prevent?
+    validations:
+      required: true
+  - type: textarea
+    id: contract
+    attributes:
+      label: Proposed contract shape
+      description: Show a concise YAML or JSON example with synthetic values.
+    validations:
+      required: true
+  - type: textarea
+    id: boundaries
+    attributes:
+      label: Determinism and privacy boundaries
+      description: Explain whether the check needs network access, external files, or source excerpts in output.
+    validations:
+      required: true

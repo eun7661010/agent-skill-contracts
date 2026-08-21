@@ -1,0 +1,41 @@
+version: 1
+skill: .
+
+rules:
+  - id: approval-before-remote-write
+    description: Remote changes need an explicit user decision.
+    target: SKILL.md
+    require:
+      any:
+        - text: explicit approval before changing remote state
+        - regex: ask\s+for\s+explicit\s+approval
+  - id: dry-run-first
+    description: A release plan must begin with local checks and a dry run.
+    require:
+      all:
+        - text: dry-run summary
+  - id: no-bypass-instructions
+    description: The skill must not teach common safety bypasses.
+    forbid:
+      - text: --no-verify
+      - regex: git\s+push\s+--force(?:-with-lease)?
+
+files:
+  required:
+    - references/release-safety.md
+
+references:
+  required:
+    - references/release-safety.md
+
+frontmatter:
+  required_fields:
+    - name
+    - description
+  required_tools:
+    - Read
+    - Bash
+
+portability:
+  forbid_personal_paths: true
+  allow_external_symlinks: false

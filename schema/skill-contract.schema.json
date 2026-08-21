@@ -1,0 +1,156 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/eun7661010/agent-skill-contracts/raw/v0.1.0/schema/skill-contract.schema.json",
+  "title": "Agent Skill behavioral contract",
+  "description": "Deterministic policy assertions for a SKILL.md package.",
+  "type": "object",
+  "required": ["version"],
+  "properties": {
+    "version": { "const": 1 },
+    "skill": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Relative path from the contract directory to the skill directory."
+    },
+    "rules": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/rule" }
+    },
+    "files": { "$ref": "#/$defs/requiredPaths" },
+    "references": {
+      "type": "object",
+      "required": ["required"],
+      "properties": {
+        "required": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "oneOf": [
+              { "type": "string", "minLength": 1 },
+              {
+                "type": "object",
+                "required": ["path"],
+                "properties": {
+                  "path": { "type": "string", "minLength": 1 },
+                  "mentioned_in": { "type": "string", "minLength": 1 }
+                },
+                "additionalProperties": false
+              }
+            ]
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "frontmatter": {
+      "type": "object",
+      "properties": {
+        "required_fields": { "$ref": "#/$defs/nonEmptyStrings" },
+        "required_tools": { "$ref": "#/$defs/nonEmptyStrings" }
+      },
+      "additionalProperties": false
+    },
+    "portability": {
+      "oneOf": [
+        { "const": false },
+        {
+          "type": "object",
+          "properties": {
+            "forbid_personal_paths": { "type": "boolean" },
+            "allow_external_symlinks": { "type": "boolean" },
+            "scan": { "$ref": "#/$defs/nonEmptyStrings" },
+            "exclude": {
+              "type": "array",
+              "items": { "type": "string", "minLength": 1 }
+            },
+            "allow": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/pattern" }
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    }
+  },
+  "patternProperties": {
+    "^x-": true
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "nonEmptyStrings": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "requiredPaths": {
+      "type": "object",
+      "required": ["required"],
+      "properties": {
+        "required": { "$ref": "#/$defs/nonEmptyStrings" }
+      },
+      "additionalProperties": false
+    },
+    "pattern": {
+      "oneOf": [
+        { "type": "string", "minLength": 1 },
+        {
+          "type": "object",
+          "properties": {
+            "text": { "type": "string", "minLength": 1 },
+            "regex": { "type": "string", "minLength": 1 },
+            "case_sensitive": { "type": "boolean" }
+          },
+          "oneOf": [
+            { "required": ["text"], "not": { "required": ["regex"] } },
+            { "required": ["regex"], "not": { "required": ["text"] } }
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "requirement": {
+      "type": "object",
+      "minProperties": 1,
+      "properties": {
+        "all": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/pattern" }
+        },
+        "any": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/pattern" }
+        }
+      },
+      "additionalProperties": false
+    },
+    "rule": {
+      "type": "object",
+      "required": ["id"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9._-]*$"
+        },
+        "description": { "type": "string" },
+        "target": { "type": "string", "minLength": 1 },
+        "require": { "$ref": "#/$defs/requirement" },
+        "forbid": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/pattern" }
+        }
+      },
+      "anyOf": [
+        { "required": ["require"] },
+        { "required": ["forbid"] }
+      ],
+      "patternProperties": {
+        "^x-": true
+      },
+      "additionalProperties": false
+    }
+  }
+}

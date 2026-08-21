@@ -1,0 +1,74 @@
+[build-system]
+requires = ["hatchling>=1.26"]
+build-backend = "hatchling.build"
+
+[project]
+name = "agent-skill-contracts"
+version = "0.1.0"
+description = "Deterministic policy-as-code checks for SKILL.md behavioral contracts"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "Apache-2.0"
+keywords = [
+  "agent-skills",
+  "skill-md",
+  "policy-as-code",
+  "ai-agents",
+  "regression-testing",
+  "github-actions",
+]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Environment :: Console",
+  "License :: OSI Approved :: Apache Software License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Software Development :: Quality Assurance",
+]
+dependencies = ["PyYAML>=6.0.2,<7"]
+
+[project.optional-dependencies]
+dev = [
+  "build>=1.2.2,<2",
+  "pytest>=8.3,<9",
+  "pytest-cov>=6,<7",
+  "jsonschema>=4.23,<5",
+  "ruff>=0.12,<1",
+]
+
+[project.scripts]
+skill-contract = "agent_skill_contracts.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/eun7661010/agent-skill-contracts"
+Documentation = "https://github.com/eun7661010/agent-skill-contracts#readme"
+Issues = "https://github.com/eun7661010/agent-skill-contracts/issues"
+Source = "https://github.com/eun7661010/agent-skill-contracts"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/agent_skill_contracts"]
+
+[tool.pytest.ini_options]
+addopts = "-ra --strict-markers"
+testpaths = ["tests"]
+
+[tool.coverage.run]
+branch = true
+source = ["agent_skill_contracts"]
+omit = ["*/__main__.py"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+fail_under = 90
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]

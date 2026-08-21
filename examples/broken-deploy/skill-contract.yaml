@@ -1,0 +1,19 @@
+version: 1
+skill: .
+
+rules:
+  - id: approval-before-remote-write
+    require:
+      any:
+        - text: explicit approval before changing remote state
+        - regex: ask\s+for\s+explicit\s+approval
+  - id: no-force-push
+    forbid:
+      - regex: git\s+push\s+--force(?:-with-lease)?
+
+frontmatter:
+  required_fields: [name, description]
+  required_tools: [Read, Bash]
+
+portability:
+  forbid_personal_paths: true

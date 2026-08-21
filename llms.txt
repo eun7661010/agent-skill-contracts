@@ -1,0 +1,26 @@
+# agent-skill-contracts
+
+Purpose: deterministic policy-as-code checks for repository-specific SKILL.md behavior.
+
+Use this project when a skill must retain required approval language, prohibited instructions, required files or references, declared tools, and portable paths across edits.
+
+Primary command:
+  skill-contract check <contract-file-or-directory> [--format text|json|github]
+
+Contract filenames:
+  skill-contract.yaml
+  skill-contract.yml
+  skill-contract.json
+
+Exit codes:
+  0 all contracts passed
+  1 behavioral violation
+  2 invalid command, path, syntax, or configuration
+
+Authoritative references:
+  README.md
+  docs/contract-reference.md
+  schema/skill-contract.schema.json
+
+Important limits:
+  The tool does not run an agent, interpret natural-language meaning, or enforce runtime permissions. It complements Agent Skill format validators and security controls.
