@@ -6,6 +6,30 @@ This document describes contract schema version `1`. The JSON Schema at `schema/
 
 `skill-contract check <path>` accepts one contract file or a directory. Directory checks recursively discover `skill-contract.yaml`, `skill-contract.yml`, and `skill-contract.json` while skipping common dependency and cache directories.
 
+## Editor setup
+
+The bundled schema can provide completion and validation while you edit `skill-contract.yaml`.
+
+### VS Code
+
+Create `.vscode/settings.json` in your clone (workspace settings, not global settings):
+
+```json
+{
+  "yaml.schemas": {
+    "./schema/skill-contract.schema.json": ["skill-contract.yaml", "skill-contract.yml"]
+  }
+}
+```
+
+Install a YAML extension that supports `yaml.schemas`, then open a contract file. An invalid `version` such as `2` and an invalid pattern object such as `{ "regex": 42 }` should be highlighted.
+
+### JetBrains IDEs
+
+In a JetBrains IDE, open **Settings | Languages & Frameworks | Schemas and DTDs | JSON Schema Mappings**, add a project mapping, and select `schema/skill-contract.schema.json` from the clone. Add `skill-contract.yaml` and `skill-contract.yml` as the file patterns. The same invalid `version` and pattern examples should be reported in the editor.
+
+For the complete field behavior, see the [JSON Schema](../schema/skill-contract.schema.json).
+
 Every path in a contract is relative. It is resolved from the contract directory and must stay below that directory. Rule targets, required files, reference files, and reference source files must also remain inside the selected skill directory.
 
 ## Top-level fields
