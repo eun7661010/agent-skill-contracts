@@ -86,7 +86,7 @@ python -m pip install "git+https://github.com/eun7661010/agent-skill-contracts@v
 - 스킬 디렉터리 안에 반드시 있어야 하는 파일
 - 실제로 존재하며 `SKILL.md`에서도 언급해야 하는 참고 문서
 - 필수 frontmatter 필드와 `allowed-tools` 도구 선언
-- 앞에 적은 규칙이나 설정을 가릴 수 있는 YAML·JSON 중복 키
+- 앞서 선언한 규칙이나 설정을 가릴 수 있는 YAML·JSON 중복 키
 - Windows, macOS, Linux의 사용자별 홈 디렉터리 절대 경로
 - 스킬 디렉터리 바깥을 가리키는 심볼릭 링크
 - 단일 계약 또는 저장소 아래에 있는 모든 계약
@@ -142,7 +142,7 @@ CLI를 직접 설치해 실행해도 됩니다.
 - `skill-contract.yml`
 - `skill-contract.json`
 
-계약 안의 경로는 계약 파일이 있는 디렉터리를 기준으로 해석합니다. `portability.scan`의 glob을 포함해 그 디렉터리 밖으로 벗어나는 경로는 허용하지 않습니다. YAML·JSON의 중복 키는 한쪽 값을 조용히 선택하지 않고 설정 오류로 처리합니다. `skill` 필드를 사용하면 계약 파일 아래에 있는 특정 스킬 디렉터리를 지정할 수 있습니다. 이름이 `x-`로 시작하는 확장 필드를 제외하면, 알 수 없는 필드도 설정 오류로 처리합니다.
+계약 안의 경로는 계약 파일이 있는 디렉터리를 기준으로 해석합니다. `portability.scan`의 glob 패턴을 포함해 그 디렉터리 밖으로 벗어나는 경로는 허용하지 않습니다. YAML·JSON의 중복 키는 한쪽 값을 임의로 선택하지 않고 설정 오류로 처리합니다. `skill` 필드를 사용하면 계약 파일 아래에 있는 특정 스킬 디렉터리를 지정할 수 있습니다. 이름이 `x-`로 시작하는 확장 필드를 제외하면, 알 수 없는 필드도 설정 오류로 처리합니다.
 
 각 필드의 의미는 [계약 참조 문서](docs/contract-reference.ko.md)와 [JSON Schema](schema/skill-contract.schema.json)에서 확인할 수 있습니다.
 
