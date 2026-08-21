@@ -6,6 +6,30 @@
 
 `skill-contract check <path>`에는 계약 파일 하나 또는 디렉터리를 전달할 수 있습니다. 디렉터리를 검사하면 하위의 `skill-contract.yaml`, `skill-contract.yml`, `skill-contract.json`을 자동으로 찾습니다. 일반적인 의존성 디렉터리와 캐시 디렉터리는 건너뜁니다.
 
+## 편집기 설정
+
+저장소에 포함된 스키마를 연결하면 `skill-contract.yaml`을 편집할 때 자동 완성과 유효성 검사를 사용할 수 있습니다.
+
+### VS Code
+
+복제한 저장소 안에 전역 설정이 아닌 워크스페이스 설정으로 `.vscode/settings.json`을 만듭니다.
+
+```json
+{
+  "yaml.schemas": {
+    "./schema/skill-contract.schema.json": ["skill-contract.yaml", "skill-contract.yml"]
+  }
+}
+```
+
+`yaml.schemas`를 지원하는 YAML 확장을 설치한 다음 계약 파일을 엽니다. `2`와 같은 잘못된 `version` 값이나 `{ "regex": 42 }`와 같은 잘못된 패턴 객체가 표시되어야 합니다.
+
+### JetBrains IDE
+
+JetBrains IDE에서 **Settings | Languages & Frameworks | Schemas and DTDs | JSON Schema Mappings**를 열고 프로젝트 매핑을 추가한 뒤, 복제한 저장소의 `schema/skill-contract.schema.json`을 선택합니다. 파일 패턴으로 `skill-contract.yaml`과 `skill-contract.yml`을 추가합니다. 같은 잘못된 `version`과 패턴 예제가 편집기에 표시되어야 합니다.
+
+전체 필드 동작은 [JSON Schema](../schema/skill-contract.schema.json)를 참고하세요.
+
 계약 안의 모든 경로는 상대 경로여야 합니다. 계약 디렉터리를 기준으로 해석하며, 그 디렉터리 밖으로 나갈 수 없습니다. 규칙 대상, 필수 파일, 참고 파일, 참고 문서를 언급해야 하는 파일도 선택한 스킬 디렉터리 안에 있어야 합니다.
 
 ## 최상위 필드
